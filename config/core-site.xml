@@ -1,7 +1,7 @@
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://main-hdfs-cluster</value>
+        <value>hdfs://ns1</value>
     </property>
     <property>
         <name>ha.zookeeper.quorum</name>
