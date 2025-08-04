@@ -1,3 +1,4 @@
+package src;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -6,8 +7,8 @@ import static org.apache.spark.sql.functions.*;
 public class TaxiAnalysis {
 
     public static void main(String[] args) {
-        String dataPath = "../data/"; 
-        String outputPath = "../data/output"; // write output
+        String dataPath = "./data/"; 
+        String outputPath = "./data/output"; // write output
 
         // Create a SparkSession for local execution
         SparkSession spark = SparkSession.builder()
@@ -17,12 +18,13 @@ public class TaxiAnalysis {
 
         // Load datasets
         Dataset<Row> tripData = spark.read().parquet(dataPath + "yellow_tripdata_2025-01.parquet");
-        Dataset<Row> zoneData = spark.read().option("header", "true").csv(dataPath + "taxiZoneLookupTable.csv");
+        Dataset<Row> zoneData = spark.read().option("header", "true").csv(dataPath + "taxiZoneLookupTable.csv");    
 
         // Run the analyses
         analysis1(tripData, outputPath);
         analysis2(tripData, zoneData, outputPath);
         analysis3(tripData, zoneData, outputPath);
+        analysis4(tripData, outputPath); 
 
         System.out.println("Processing complete. Output written to " + outputPath);
         spark.stop();
@@ -37,7 +39,7 @@ public class TaxiAnalysis {
         Dataset<Row> longTrips = tripData
                 .filter(col("passenger_count").gt(2).and(col("trip_distance").gt(5)))
                 .withColumn("duration_minutes",
-                        (col("tpep_dropoff_datetime").cast("long") - col("tpep_pickup_datetime").cast("long")) / 60)
+                        (unix_timestamp(col("tpep_dropoff_datetime")).minus(unix_timestamp(col("tpep_pickup_datetime")))).divide(60))
                 .orderBy(col("duration_minutes").desc());
 
         longTrips.write().mode("overwrite").parquet(outputPath + "q1_long_trips.parquet");
@@ -81,4 +83,21 @@ public class TaxiAnalysis {
         System.out.println("Analysis 3 finished.");
     }
 
+    /**
+     * Analysis 4: Calculates the maximum tip amount per day.
+     */
+    public static void analysis4(Dataset<Row> tripData, String outputPath) {
+        System.out.println("Running Analysis 4: Maximum Tip per Day...");
+        Dataset<Row> maxTipPerDay = tripData
+                // Create a new column 'date' by converting the pickup timestamp
+                .withColumn("date", to_date(col("tpep_pickup_datetime")))
+                // Group by the new 'date' column
+                .groupBy("date")
+                // Find the maximum tip_amount for each day
+                .agg(max("tip_amount").alias("max_tip"))
+                .orderBy("date");
+
+        maxTipPerDay.write().mode("overwrite").parquet(outputPath + "q4_max_tip_per_day.parquet");
+        System.out.println("Analysis 4 finished.");
+    }
 }
