@@ -22,6 +22,7 @@ public class TaxiAnalysis {
         // Run the analyses
         analysis1(tripData, outputPath);
         analysis2(tripData, zoneData, outputPath);
+        analysis3(tripData, zoneData, outputPath);
 
         System.out.println("Processing complete. Output written to " + outputPath);
         spark.stop();
@@ -57,4 +58,27 @@ public class TaxiAnalysis {
         avgFareByZone.write().mode("overwrite").parquet(outputPath + "q2_avg_fare_by_zone.parquet");
         System.out.println("Analysis 2 finished.");
     }
+
+
+    /**
+     * Nnalysis 3: Calculates total revenue and trip count for each destination Borough.
+     */
+    public static void analysis3(Dataset<Row> tripData, Dataset<Row> zoneData, String outputPath) {
+        System.out.println("Running Analysis 3: Revenue by Destination Borough...");
+        Dataset<Row> revenueByBorough = tripData
+                // Join based on Dropoff Location ID (DOLocationID)
+                .join(zoneData, tripData.col("DOLocationID").equalTo(zoneData.col("LocationID")))
+                // Group by the destination Borough
+                .groupBy("Borough")
+                // Calculate sum of total_amount and count of trips
+                .agg(
+                    sum("total_amount").alias("total_revenue"),
+                    count("*").alias("trip_count")
+                )
+                .orderBy(col("total_revenue").desc());
+
+        revenueByBorough.write().mode("overwrite").parquet(outputPath + "q3_revenue_by_borough.parquet");
+        System.out.println("Analysis 3 finished.");
+    }
+
 }
