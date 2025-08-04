@@ -1,34 +1,43 @@
 <configuration>
+    <!-- General HA properties -->
     <property>
         <name>dfs.nameservices</name>
-        <value>main-hdfs-cluster</value>
+        <value>ns1</value>
     </property>
     <property>
-        <name>dfs.ha.namenodes.main-hdfs-cluster</name>
+        <name>dfs.ha.namenodes.ns1</name>
         <value>namenode1,namenode2</value>
     </property>
+
+    <!-- NameNode 1 configuration -->
     <property>
-        <name>dfs.namenode.rpc-address.main-hdfs-cluster.namenode1</name>
-        <value>namenode1:9000</value>
+        <name>dfs.namenode.rpc-address.ns1.namenode1</name>
+        <value>namenode1:8020</value>
     </property>
     <property>
-        <name>dfs.namenode.http-address.main-hdfs-cluster.namenode1</name>
-        <value>namenode1:9870</value>
+        <name>dfs.namenode.http-address.ns1.namenode1</name>
+        <value>namenode1:50070</value>
+    </property>
+
+    <!-- NameNode 2 configuration -->
+    <property>
+        <name>dfs.namenode.rpc-address.ns1.namenode2</name>
+        <value>namenode2:8020</value>
     </property>
     <property>
-        <name>dfs.namenode.rpc-address.main-hdfs-cluster.namenode2</name>
-        <value>namenode2:9000</value>
+        <name>dfs.namenode.http-address.ns1.namenode2</name>
+        <value>namenode2:50070</value>
     </property>
-    <property>
-        <name>dfs.namenode.http-address.main-hdfs-cluster.namenode2</name>
-        <value>namenode2:9870</value>
-    </property>
+
+    <!-- JournalNodes configuration -->
     <property>
         <name>dfs.namenode.shared.edits.dir</name>
-        <value>qjournal://journalnode:8485/main-hdfs-cluster</value>
+        <value>qjournal://journalnode1:8485;journalnode2:8485;journalnode3:8485/ns1</value>
     </property>
+
+    <!-- Failover configuration -->
     <property>
-        <name>dfs.client.failover.proxy.provider.main-hdfs-cluster</name>
+        <name>dfs.client.failover.proxy.provider.ns1</name>
         <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
     </property>
     <property>
@@ -36,11 +45,7 @@
         <value>true</value>
     </property>
     <property>
-        <name>dfs.journalnode.edits.dir</name>
-        <value>/hadoop/dfs/journal</value>
-    </property>
-    <property>
-        <name>dfs.namenode.name.dir</name>
-        <value>file:///hadoop/dfs/name</value>
+        <name>dfs.ha.fencing.methods</name>
+        <value>shell(/bin/true)</value>
     </property>
 </configuration>
