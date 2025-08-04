@@ -21,6 +21,7 @@ public class TaxiAnalysis {
 
         // Run the analyses
         analysis1(tripData, outputPath);
+        analysis2(tripData, zoneData, outputPath);
 
         System.out.println("Processing complete. Output written to " + outputPath);
         spark.stop();
@@ -40,5 +41,20 @@ public class TaxiAnalysis {
 
         longTrips.write().mode("overwrite").parquet(outputPath + "q1_long_trips.parquet");
         System.out.println("Analysis 1 finished.");
+    }
+
+    /**
+     * Analysis 2: Calculates the average fare for each pickup zone.
+     */
+    public static void analysis2(Dataset<Row> tripData, Dataset<Row> zoneData, String outputPath) {
+        System.out.println("Running Analysis 2: Average Fare by Zone...");
+        Dataset<Row> avgFareByZone = tripData
+                .join(zoneData, tripData.col("PULocationID").equalTo(zoneData.col("LocationID")))
+                .groupBy("Zone", "Borough")
+                .agg(avg("fare_amount").alias("average_fare"))
+                .orderBy(col("average_fare").desc());
+
+        avgFareByZone.write().mode("overwrite").parquet(outputPath + "q2_avg_fare_by_zone.parquet");
+        System.out.println("Analysis 2 finished.");
     }
 }
