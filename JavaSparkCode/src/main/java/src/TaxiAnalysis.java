@@ -8,8 +8,8 @@ import static org.apache.spark.sql.functions.*;
 public class TaxiAnalysis {
 
     public static void main(String[] args) {
-        String dataPath = "./data/"; 
-        String outputPath = "./data/output"; // write output
+        String dataPath = "/opt/bitnami/spark/data/";  // Container path
+        String outputPath = "/opt/bitnami/spark/output/";  // Container path
 
         // Create a SparkSession for local execution
         SparkSession spark = SparkSession.builder()
