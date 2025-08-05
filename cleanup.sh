@@ -6,6 +6,8 @@ answer=${answer:-n}
 
 if [[ "$answer" =~ ^[Yy]$ ]]; then
     docker compose down -v
+    docker rm -f zookeeper1 zookeeper2 zookeeper3 journalnode1 journalnode2 journalnode3 \ 
+                 namenode1 namenode2 datanode1 datanode2 spark-client
 
 else
     echo "Operation cancelled."
@@ -36,4 +38,5 @@ docker compose run --rm namenode2 standby
 
 
 docker compose down
+echo "--------------------------------"
 echo "Cleanup and setup completed successfully. you can now start the services usint 'docker compose up' command."
