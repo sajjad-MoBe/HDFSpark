@@ -23,6 +23,8 @@ services:
       - hadoop-network
     volumes:
       - journalnode1-data:/hadoop/dfs/journal
+      - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
+      - ./config/core-site.xml:/etc/hadoop/core-site.xml
     environment:
       - CLUSTER_NAME=test-ha
     ports:
@@ -37,6 +39,8 @@ services:
       - hadoop-network
     volumes:
       - journalnode2-data:/hadoop/dfs/journal
+      - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
+      - ./config/core-site.xml:/etc/hadoop/core-site.xml
     environment:
       - CLUSTER_NAME=test-ha
     ports:
