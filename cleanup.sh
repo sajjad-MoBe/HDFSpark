@@ -36,3 +36,4 @@ docker compose run --rm namenode2 standby
 
 
 docker compose down
+echo "Cleanup and setup completed successfully. you can now start the services usint 'docker compose up' command."

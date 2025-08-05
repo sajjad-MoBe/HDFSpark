@@ -18,6 +18,6 @@
   </property>
   <property>
     <name>ha.zookeeper.quorum</name>
-    <value>zookeeper:2181</value>
+    <value>zookeeper1:2181,zookeeper2:2181,zookeeper3:2181</value>
   </property>
 </configuration>
