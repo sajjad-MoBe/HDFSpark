@@ -207,3 +207,4 @@ volumes:
   datanode2-data:
   journalnode1-data:
   journalnode2-data:
+  journalnode3-data:
