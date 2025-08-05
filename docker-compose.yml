@@ -1,157 +1,124 @@
 version: '3.8'
 
-networks:
-  hadoop-network:
-    driver: bridge
-
-volumes:
-  namenode1-data:
-  namenode2-data:
-  datanode1-data:
-  datanode2-data:
-  # datanode3-data:
-  journalnode1-data:
-  journalnode2-data:
-  journalnode3-data:
-
 services:
   zookeeper:
     image: bitnami/zookeeper:3.8
+    container_name: zookeeper
     hostname: zookeeper
     networks:
-      - hadoop-network
+      - hadoop-net
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=zookeeper:2888:3888
       ALLOW_ANONYMOUS_LOGIN: yes
     ports:
       - "2181:2181"
-      
 
   journalnode1:
-    image: f21global/hadoop:2.8.2
+    image: bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
+    container_name: journalnode1
     hostname: journalnode1
+    command: ["hdfs", "journalnode"]
     networks:
-      - hadoop-network
+      - hadoop-net
     volumes:
       - journalnode1-data:/hadoop/dfs/journal
     environment:
-      CLUSTER_NAME: main-cluster
-      HADOOP_ROLE: journalnode
+      - CLUSTER_NAME=test-ha
+    ports:
+      - "8485:8485"
 
   journalnode2:
-    image: f21global/hadoop:2.8.2
+    image: bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
+    container_name: journalnode2
     hostname: journalnode2
+    command: ["hdfs", "journalnode"]
     networks:
-      - hadoop-network
+      - hadoop-net
     volumes:
       - journalnode2-data:/hadoop/dfs/journal
     environment:
-      CLUSTER_NAME: main-cluster
-      HADOOP_ROLE: journalnode
-
-  journalnode3:
-    image: f21global/hadoop:2.8.2
-    hostname: journalnode3
-    networks:
-      - hadoop-network
-    volumes:
-      - journalnode3-data:/hadoop/dfs/journal
-    environment:
-      CLUSTER_NAME: main-cluster
-      HADOOP_ROLE: journalnode
+      - CLUSTER_NAME=test-ha
+    ports:
+      - "8486:8485"
 
   namenode1:
-    image: f21global/hadoop:2.8.2
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode1
     hostname: namenode1
     networks:
-      - hadoop-network
+      - hadoop-net
     volumes:
+      - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
+      - ./config/core-site.xml:/etc/hadoop/core-site.xml
       - namenode1-data:/hadoop/dfs/name
-    environment:
-      CLUSTER_NAME: main-cluster
-      DFS_NAMESERVICE_ID: ns1
-      DFS_NAMENODE_SHARED_EDITS_DIR: journalnode1:8485,journalnode2:8485,journalnode3:8485
-      DFS_NAMENODE_RPC_ADDRESS_NN1: namenode1:8020
-      DFS_NAMENODE_RPC_ADDRESS_NN2: namenode2:8020
-      DFS_NAMENODE_HTTP_ADDRESS_NN1: namenode1:50070
-      DFS_NAMENODE_HTTP_ADDRESS_NN2: namenode2:50070
-      HA_ZOOKEEPER_QUORUM: zookeeper:2181
-      HADOOP_ROLE: namenode
     ports:
-      - "50070:50070"
+      - "9870:9870"
+    environment:
+      - CLUSTER_NAME=test-ha
+    depends_on:
+      - zookeeper
+      - journalnode1
+      - journalnode2
 
   namenode2:
-    image: f21global/hadoop:2.8.2
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode2
     hostname: namenode2
     networks:
-      - hadoop-network
+      - hadoop-net
     volumes:
+      - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
+      - ./config/core-site.xml:/etc/hadoop/core-site.xml
       - namenode2-data:/hadoop/dfs/name
-    environment:
-      CLUSTER_NAME: main-cluster
-      DFS_NAMESERVICE_ID: ns1
-      DFS_NAMENODE_SHARED_EDITS_DIR: journalnode1:8485,journalnode2:8485,journalnode3:8485
-      DFS_NAMENODE_RPC_ADDRESS_NN1: namenode1:8020
-      DFS_NAMENODE_RPC_ADDRESS_NN2: namenode2:8020
-      DFS_NAMENODE_HTTP_ADDRESS_NN1: namenode1:50070
-      DFS_NAMENODE_HTTP_ADDRESS_NN2: namenode2:50070
-      HA_ZOOKEEPER_QUORUM: zookeeper:2181
-      STANDBY: "true"
-      HADOOP_ROLE: namenode
     ports:
-      - "50071:50070"
+      - "9871:9870"
+    environment:
+      - CLUSTER_NAME=test-ha
+    depends_on:
+      - zookeeper
+      - journalnode1
+      - journalnode2
 
   datanode1:
-    image: f21global/hadoop:2.8.2
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode1
     hostname: datanode1
     networks:
-      - hadoop-network
+      - hadoop-net
     volumes:
+      - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
+      - ./config/core-site.xml:/etc/hadoop/core-site.xml
       - datanode1-data:/hadoop/dfs/data
     environment:
-      DFS_NAMESERVICES: ns1
-      NS1_DFS_NAMENODE_RPC_ADDRESS_NN1: namenode1:8020
-      NS1_DFS_NAMENODE_RPC_ADDRESS_NN2: namenode2:8020
-      NS1_DFS_NAMENODE_HTTP_ADDRESS_NN1: namenode1:50070
-      NS1_DFS_NAMENODE_HTTP_ADDRESS_NN2: namenode2:50070
-      HADOOP_ROLE: datanode
-    ports:
-      - "50075:50075"
+      - CLUSTER_NAME=test-ha
+      
+    depends_on:
+      - zookeeper
+      - journalnode1
+      - journalnode2
+      - namenode1
+      - namenode2
 
   datanode2:
-    image: f21global/hadoop:2.8.2
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode2
     hostname: datanode2
     networks:
-      - hadoop-network
+      - hadoop-net
     volumes:
+      - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
+      - ./config/core-site.xml:/etc/hadoop/core-site.xml
       - datanode2-data:/hadoop/dfs/data
     environment:
-      DFS_NAMESERVICES: ns1
-      NS1_DFS_NAMENODE_RPC_ADDRESS_NN1: namenode1:8020
-      NS1_DFS_NAMENODE_RPC_ADDRESS_NN2: namenode2:8020
-      NS1_DFS_NAMENODE_HTTP_ADDRESS_NN1: namenode1:50070
-      NS1_DFS_NAMENODE_HTTP_ADDRESS_NN2: namenode2:50070
-      HADOOP_ROLE: datanode
-    ports:
-      - "50076:50075"
-
-  # datanode3:
-  #   image: f21global/hadoop:2.8.2
-  #   hostname: datanode3
-  #   networks:
-  #     - hadoop-network
-  #   volumes:
-  #     - datanode3-data:/hadoop/dfs/data
-  #   environment:
-  #     DFS_NAMESERVICES: ns1
-  #     NS1_DFS_NAMENODE_RPC_ADDRESS_NN1: namenode1:8020
-  #     NS1_DFS_NAMENODE_RPC_ADDRESS_NN2: namenode2:8020
-  #     NS1_DFS_NAMENODE_HTTP_ADDRESS_NN1: namenode1:50070
-  #     NS1_DFS_NAMENODE_HTTP_ADDRESS_NN2: namenode2:50070
-  #     HADOOP_ROLE: datanode
-  #   ports:
-  #     - "50077:50075"
+      - CLUSTER_NAME=test-ha
+      
+    depends_on:
+      - zookeeper
+      - journalnode1
+      - journalnode2
+      - namenode1
+      - namenode2
 
   spark-client:
     image: bitnami/spark:3
@@ -165,8 +132,21 @@ services:
     networks:
       - hadoop-network
     depends_on:
+      - zookeeper
+      - journalnode1
+      - journalnode2
       - namenode1
       - namenode2
       - datanode1
       - datanode2
-      # - datanode3
+
+networks:
+  hadoop-net:
+
+volumes:
+  namenode1-data:
+  namenode2-data:
+  datanode1-data:
+  datanode2-data:
+  journalnode1-data:
+  journalnode2-data:
