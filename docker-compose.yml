@@ -11,6 +11,8 @@ services:
       - ZOO_SERVERS=zookeeper1:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
     networks:
       - hadoop-network
+    volumes:
+      - zookeeper1-data:/bitnami/zookeeper
     
   zookeeper2:
     image: bitnami/zookeeper:3.8
@@ -22,6 +24,8 @@ services:
       - ZOO_SERVERS=zookeeper1:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
     networks:
       - hadoop-network
+    volumes:
+      - zookeeper2-data:/bitnami/zookeeper
 
   zookeeper3:
     image: bitnami/zookeeper:3.8
@@ -33,6 +37,8 @@ services:
       - ZOO_SERVERS=zookeeper1:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
     networks:
       - hadoop-network
+    volumes:
+      - zookeeper3-data:/bitnami/zookeeper
 
   journalnode1:
     image: bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
@@ -208,3 +214,6 @@ volumes:
   journalnode1-data:
   journalnode2-data:
   journalnode3-data:
+  zookeeper1-data:
+  zookeeper2-data:
+  zookeeper3-data:
