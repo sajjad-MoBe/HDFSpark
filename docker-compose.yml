@@ -98,9 +98,12 @@ services:
     environment:
       - CLUSTER_NAME=test-ha
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
       - journalnode1
       - journalnode2
+      - journalnode3
 
   namenode2:
     build: './ha-hadoop-namenode'
@@ -117,9 +120,12 @@ services:
     environment:
       - CLUSTER_NAME=test-ha
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
       - journalnode1
       - journalnode2
+      - journalnode3
 
 
   datanode1:
@@ -136,9 +142,12 @@ services:
       - CLUSTER_NAME=test-ha
       
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
       - journalnode1
       - journalnode2
+      - journalnode3
       - namenode1
       - namenode2
 
@@ -156,9 +165,12 @@ services:
       - CLUSTER_NAME=test-ha
       
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
       - journalnode1
       - journalnode2
+      - journalnode3
       - namenode1
       - namenode2
 
@@ -174,9 +186,12 @@ services:
     networks:
       - hadoop-network
     depends_on:
-      - zookeeper
+      - zookeeper1
+      - zookeeper2
+      - zookeeper3
       - journalnode1
       - journalnode2
+      - journalnode3
       - namenode1
       - namenode2
       - datanode1
