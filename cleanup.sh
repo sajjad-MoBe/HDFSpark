@@ -13,7 +13,7 @@ else
 fi
 
 
-docker compose up zookeeper journalnode1 journalnode2  -d
+docker compose up zookeeper1 zookeeper2 zookeeper3 journalnode1 journalnode2 journalnode3 -d
 
 sleep 20
 
