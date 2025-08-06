@@ -36,8 +36,8 @@ while true; do
 
       if [[ "$answer" =~ ^[Yy]$ ]]; then
         docker compose down -v
-        docker rm -f zookeeper1 zookeeper2 zookeeper3 journalnode1 journalnode2 journalnode3 \ 
-                      namenode1 namenode2 datanode1 datanode2 spark-client
+        docker rm -f zookeeper1 zookeeper2 zookeeper3 journalnode1 journalnode2 journalnode3 
+        docker rm -f namenode1 namenode2 datanode1 datanode2 spark-client
 
         docker compose up zookeeper1 zookeeper2 zookeeper3 journalnode1 journalnode2 journalnode3 -d
 
