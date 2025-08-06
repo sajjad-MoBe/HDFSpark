@@ -54,7 +54,7 @@ while true; do
 
         docker compose down
         echo "--------------------------------"
-        echo "Cleanup and setup completed successfully. you can now start the services usint 'docker compose up' command."
+        echo "Format and setup completed successfully. you can now start the services usint 'docker compose up' command."
         exit 0
       else
         echo "Operation cancelled."
