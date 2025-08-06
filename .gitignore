@@ -1,4 +1,4 @@
 .vscode/*
-JavaSparkCode/**
+simple-java-spark-code/**
 hdfs-data/**
 spark-apps/**
