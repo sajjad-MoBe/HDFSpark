@@ -1,6 +1,7 @@
 # HDFSpark
 
-A scalable data analytics project using Hadoop Distributed File System (HDFS) and Apache Spark for processing large-scale taxi trip data.
+**HDFSpark** is a scalable and highly available **Hadoop Distributed File System (HDFS)** cluster built with **Docker Compose**, featuring automatic failover via **ZooKeeper** and integrated with **Apache Spark**.
+
 
 ## Project Overview
 
@@ -16,37 +17,53 @@ This project provides a complete setup for distributed data processing using:
 ### 1. Initial Cluster Setup with Docker Compose
 
 The project uses Docker Compose to set up a multi-container HDFS cluster. This includes:
-
-- NameNode for HDFS management
+- ZooKeeper quorum for automatic failover coordination
+- JournalNodes for shared edit log persistence
+- Multiple DataNodes with persistent volumes
 - DataNodes for distributed storage
-- Spark master and worker nodes
+- Spark client for run jobs
 
-First, navigate to the project's root directory:
-
-```bash
-cd path/to/project-directory
-```
-
-Run the management script:
+#### 1. Clone the repository
 
 ```bash
-bash manage.sh
+git clone https://github.com/your-username/HDFSpark.git
+cd HDFSpark
 ```
 
-Select option `1) Format NameNodes`. This initialization:
+#### 2. Format the Cluster (First-Time Only)
+
+Run the management script and select option `1) Format NameNodes`. This initialization:
 
 - Creates necessary directories
 - Formats the HDFS filesystem
 - Prepares the cluster for first use
   This step is only required for the first run.
 
-Start the Docker containers:
+```bash
+chmod +x manage.sh
+./manage.sh
+```
+
+After formatting is complete, you can start the cluster.
+
+#### 3. Start the Cluster
+
+```bash
+docker compose up
+```
+
+Or to run it in the background:
 
 ```bash
 docker compose up -d
 ```
 
-The `-d` flag runs containers in detached mode (background).
+Once running, the HDFS web UI will be available at:
+
+* [http://localhost:9870](http://localhost:9870) — Active NameNode UI
+
+---
+
 
 ### 2. Loading Files to HDFS
 
@@ -75,6 +92,7 @@ bash manage.sh
 Select option `2) Sync hdfs-data/taxi local -> HDFS`
 This copies all files from local `hdfs-data/taxi` to HDFS `/data/taxi` directory.
 
+---
 ### 3. Running Spark Jobs
 
 #### Step 0: Building JAR File (if needed)
@@ -106,6 +124,10 @@ The Spark job will:
 2. Process the taxi trip data
 3. Write results back to HDFS
 
+When spark is running, the Splark web UI will be available at:
+
+* [http://localhost:4040](http://localhost:40404) — Spark web UI
+---
 ### 4. Retrieving Outputs from HDFS
 
 To get the processed results:
@@ -117,6 +139,7 @@ bash manage.sh
 Select option `3) Sync hdfs-data/output HDFS -> local`
 This downloads all output files from HDFS to your local machine.
 
+---
 ### 5. Data Paths Reference
 
 The system uses consistent paths for data management:
@@ -158,8 +181,12 @@ bash manage.sh  # Select option 4
 bash manage.sh  # Select option 3
 ```
 
-### Troubleshooting
+## 👥 Contributors
 
-- If containers fail to start, check Docker logs: `docker compose logs`
-- For HDFS issues, access the NameNode UI at `localhost:9870`
-- For Spark issues, check Spark UI
+> Made with ❤️ by:
+
+* **Sajjad Mohammadbeigi**
+* **Nazanin Yousefi**
+* **Mohammad Mohammadbeigi**
+
+---
