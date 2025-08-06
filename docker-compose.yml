@@ -96,6 +96,7 @@ services:
     networks:
       - hadoop-network
     volumes:
+      - ./hdfs-data:/data:rw
       - ./config/hdfs-site.xml:/etc/hadoop/hdfs-site.xml
       - ./config/core-site.xml:/etc/hadoop/core-site.xml
       - namenode1-data:/hadoop/dfs/name
@@ -185,12 +186,15 @@ services:
     hostname: spark-client
     command: ["tail", "-f", "/dev/null"]
     volumes:
-      - ./data:/data
-      - ./spark-apps:/apps
+      - ./spark-apps:/spark-apps
       - ./config/core-site.xml:/opt/bitnami/spark/conf/core-site.xml
       - ./config/hdfs-site.xml:/opt/bitnami/spark/conf/hdfs-site.xml
     networks:
       - hadoop-network
+    ports:
+      - "4040:4040"
+    environment:
+      - HADOOP_USER_NAME=root
     depends_on:
       - zookeeper1
       - zookeeper2
