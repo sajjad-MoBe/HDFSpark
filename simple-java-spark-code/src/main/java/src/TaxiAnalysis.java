@@ -19,7 +19,7 @@ public class TaxiAnalysis {
 
         // Load datasets
         Dataset<Row> tripData = spark.read().parquet(dataPath + "yellow_tripdata_2025-01.parquet");
-        Dataset<Row> zoneData = spark.read().option("header", "true").csv(dataPath + "taxiZoneLookupTable.csv");    
+        Dataset<Row> zoneData = spark.read().option("header", "true").csv(dataPath + "taxi_zone_lookup.csv");    
 
         // Run the analyses
         analysis1(tripData, outputPath);
