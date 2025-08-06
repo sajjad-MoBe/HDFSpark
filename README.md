@@ -26,7 +26,7 @@ The project uses Docker Compose to set up a multi-container HDFS cluster. This i
 #### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/HDFSpark.git
+git clone https://github.com/sajjad-MoBe/HDFSpark.git
 cd HDFSpark
 ```
 
